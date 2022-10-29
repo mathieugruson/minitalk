@@ -6,62 +6,46 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/29 16:15:54 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/29 17:52:35 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-// void	send_bit(int bit)
-// {
-// 	static int	base;
-// 	static int	i;
-// 	static int	letter;
-
-// 	i = 1;
-// 	base = 1;
-// 	letter = 0;
-// 	while (i++ < 8 )
-// 	{
-// 		letter = letter + bit * base;
-// 		base = base * 2;
-// 	}
-// 	if (i = 8)
-// 	{
-// 		ft_putchar(letter);
-// 		i = 0;
-// 		base = 1; 
-// 		letter = 0;
-// 	}
-// }
-
-void	handle_signal(int signal)
+void	handle_signal(int signal, char *tab)
 {
 	static int		m = 1;
 	static int		r = 0;
-	static int		i = 0; 
+	static int		i = 0;
+	char			c; 
 
 	if (signal == SIGUSR1)
 	{
 		r = r + 1 * m;
-		printf("bit 1\n");
+		// printf("bit 1\n");
 	}
 	else if (signal == SIGUSR2)
 	{
 		r = r + 0 * m;
-		printf("bit 0\n");	
+		// printf("bit 0\n");	
 	}
 	m = m * 2;
 	i++;
 	if (i == 8)
 	{
-		printf (" lettre : %c and %d end\n", r, r);	
+		c = r;
+		ft_printf("%c", c);
+		i = 0;
+		m = 1;
+		r = 0;
 	}
 
 }
 
 int	main(int argc, char **argv)
 {
+
+	tab = malloc(sizeof(char))
 	if (argc != 1)
 		return(ft_printf("wrong nb arg\n"), 0);
 	ft_printf("PID : %d\n", getpid());
