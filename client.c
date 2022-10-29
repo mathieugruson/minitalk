@@ -6,37 +6,46 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:34:13 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/28 23:35:28 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/29 15:58:38 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	send_message(int pid)
+void	send_message(int pid, char c)
 {
-	int	bit;
-	
-	bit = 0;
-	while (bit++ < 8)
+	int	i;
+
+	i = 0;
+	while (i < 8)
 	{
-		if (bit % 2 == 1)
-			kill(pid, SIGUSR2);
-		if (bit % 2 == 0)
-			kill(pid, SIGUSR2);
-		printf("c1\n");
-	}  
+		if ((c & 1) == 1)
+		{
+			kill(pid, SIGUSR1);
+		}
+		if ((c & 1) == 0)
+		{
+			kill(pid, SIGUSR2);			
+		}
+		c = c >> 1;
+		usleep(200);
+		i++;
+	}
 }
 
 int	main(int argc, char **argv)
 {
 	int	pid;
+	int i;
+	int	strlen;
 	// securiser avec les arguments
 	pid = ft_atoi(argv[1]); 
-	send_message(pid);
+	i = 0;
+	strlen = ft_strlen(argv[2]);
+	while(i < strlen)
+	{	
+		send_message(pid, argv[2][i]);
+		i++;
+	}
 	return (0);
 }
-
-/*
-kill = send signal and the process which receive it know what to do with it
-
-*/
