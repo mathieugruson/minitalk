@@ -6,11 +6,68 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/30 19:22:58 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/30 22:08:21 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
+
+char	*ft_strjoint(char *s1, char *s2)
+{
+	int		i;
+	int		l;
+	char	*s3;
+
+	i = 0;
+	l = 0;
+	if (!s1 || !s2)
+		return (NULL);
+	s3 = (char *)malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
+	if (!s3)
+		return (NULL);
+	while (s1[i])
+	{
+		s3[l] = s1[i];
+		i++;
+		l++;
+	}
+	i = 0;
+	while (s2[i])
+		s3[l++] = s2[i++];
+	s3[l] = '\0';
+	return (s3);
+}
+
+char	*send_char(char c, char *str)
+{	
+	if (!c)
+		return (str);
+	if (!str)
+	{
+		str = malloc(sizeof(char) * 2);
+		str[0] = c;
+		str[1] = '\0';
+	}
+	else
+		str = ft_strjoint(str, &c);
+	return (str);
+}
+
+int	ft_strncmpt(char *s1, char *s2, size_t n)
+{
+	size_t	i;
+
+	i = 0;
+	while (((s1[i] != '\0') && (i < n)) || ((s2[i] != '\0') && (i < n)))
+	{
+		if (s1[i] != s2[i])
+		{
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+		}
+		i++;
+	}
+	return (0);
+}
 
 void	handle_signal(int signal, siginfo_t *client)
 {
@@ -18,7 +75,9 @@ void	handle_signal(int signal, siginfo_t *client)
 	static int		r = 0;
 	static int		i = 0;
 	char			c; 
-
+	static char		*str;
+	
+	
 	if (signal == SIGUSR1)
 	{
 		r = r + 1 * m;
@@ -32,7 +91,19 @@ void	handle_signal(int signal, siginfo_t *client)
 	if (i == 8)
 	{
 		c = r;
-		ft_printf("%c", c);
+		str = send_char(c, str);
+		if (c == 0)
+		{	
+			ft_printf("str : %s\n", str);
+			if (ft_strncmpt(str, "end", 3) == 0)
+			{	
+				kill(client->si_pid, SIGUSR1);
+				str = NULL;
+				exit(0);
+			}
+			// free(str);	
+			str = NULL;
+		}
 		i = 0;
 		m = 1;
 		r = 0;
