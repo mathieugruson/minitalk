@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/30 22:08:21 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/30 22:11:47 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void	handle_signal(int signal, siginfo_t *client)
 		if (c == 0)
 		{	
 			ft_printf("str : %s\n", str);
-			if (ft_strncmpt(str, "end", 3) == 0)
+			if (ft_strncmpt(str, "end", 3) == 0 && ft_strlen(str) == 3)
 			{	
 				kill(client->si_pid, SIGUSR1);
 				str = NULL;
