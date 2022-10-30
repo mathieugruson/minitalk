@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/30 22:11:47 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/30 23:29:34 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	*ft_strjoint(char *s1, char *s2)
 		return (NULL);
 	s3 = (char *)malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
 	if (!s3)
-		return (NULL);
+		return (free(s1), NULL);
 	while (s1[i])
 	{
 		s3[l] = s1[i];
@@ -35,22 +35,7 @@ char	*ft_strjoint(char *s1, char *s2)
 	while (s2[i])
 		s3[l++] = s2[i++];
 	s3[l] = '\0';
-	return (s3);
-}
-
-char	*send_char(char c, char *str)
-{	
-	if (!c)
-		return (str);
-	if (!str)
-	{
-		str = malloc(sizeof(char) * 2);
-		str[0] = c;
-		str[1] = '\0';
-	}
-	else
-		str = ft_strjoint(str, &c);
-	return (str);
+	return (free(s1), s3);
 }
 
 int	ft_strncmpt(char *s1, char *s2, size_t n)
@@ -69,15 +54,36 @@ int	ft_strncmpt(char *s1, char *s2, size_t n)
 	return (0);
 }
 
-void	handle_signal(int signal, siginfo_t *client)
+char	*send_char(char c, char *str)
+{	
+	if (!c)
+		return (str);
+	if (!str)
+	{
+		str = malloc(sizeof(char) * 2);
+		if (!str)
+			exit (0);
+		str[0] = c;
+		str[1] = '\0';
+	}
+	else
+	{
+		str = ft_strjoint(str, &c);
+		if (str == NULL)
+			exit (0);
+	}
+	return (str);
+}
+
+static void	handle_signal(int signal, siginfo_t *client, void *unused)
 {
 	static int		m = 1;
 	static int		r = 0;
 	static int		i = 0;
-	char			c; 
-	static char		*str;
+	char			c = 0; 
+	static char		*str = NULL;
 	
-	
+	(void)unused;
 	if (signal == SIGUSR1)
 	{
 		r = r + 1 * m;
@@ -98,10 +104,11 @@ void	handle_signal(int signal, siginfo_t *client)
 			if (ft_strncmpt(str, "end", 3) == 0 && ft_strlen(str) == 3)
 			{	
 				kill(client->si_pid, SIGUSR1);
+				free(str);
 				str = NULL;
 				exit(0);
 			}
-			// free(str);	
+			free(str);	
 			str = NULL;
 		}
 		i = 0;
@@ -114,9 +121,9 @@ void	handle_signal(int signal, siginfo_t *client)
 int	main(int argc, char **argv)
 {
 	struct sigaction	sig;
-
-	if (argc != 1)
-		return(ft_printf("wrong nb arg\n"), 0);
+	
+	if (argc != 1 && argv[0])
+		return(ft_printf("Don't put arg\n"), 0);
 	ft_printf("PID : %d\n", getpid());
 
 	sig.sa_sigaction = handle_signal;

@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:34:13 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/30 22:04:23 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/30 22:52:39 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	handle_signal(int signal)
 	receive = 1;
 }
 
-void	send_message(int pid, char c, char *str)
+void	send_message(int pid, char c)
 {
 	int	i;
 
@@ -50,19 +50,20 @@ int	main(int argc, char **argv)
 	int	pid;
 	int i;
 	int	strlen;
-	char *str;
-	// securiser avec les arguments
-	pid = ft_atoi(argv[1]); 
+
+	if (argc != 3)
+		return (0);
+	pid = ft_atoi(argv[1]);
+	if (pid < 1 || pid > 4194304)
+		write(2, "Invalid arguments\n", 18); 
 	i = 0;
 	strlen = ft_strlen(argv[2]);
-	str = malloc(sizeof(char) * (strlen + 1));
-	ft_strlcpy(str, argv[2], (strlen + 1));
+
 	signal(SIGUSR1, handle_signal);
 	while(i <= strlen)
 	{
-		send_message(pid, str[i], str);
+		send_message(pid, argv[2][i]);
 		i++;	
 	}
-	
 	return (0);
 }
