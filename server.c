@@ -6,76 +6,34 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/31 11:13:08 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/31 12:02:57 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-char	*ft_strjoint(char *s1, char *s2)
-{
-	int		i;
-	int		l;
-	char	*s3;
-
-	i = 0;
-	l = 0;
-	if (!s1 || !s2)
-		return (NULL);
-	s3 = (char *)malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
-	if (!s3)
-		return (free(s1), NULL);
-	while (s1[i])
-	{
-		s3[l] = s1[i];
-		i++;
-		l++;
-	}
-	i = 0;
-	while (s2[i])
-		s3[l++] = s2[i++];
-	s3[l] = '\0';
-	return (free(s1), s3);
-}
-
-int	ft_strncmpt(char *s1, char *s2, size_t n)
-{
-	size_t	i;
-
-	i = 0;
-	while (((s1[i] != '\0') && (i < n)) || ((s2[i] != '\0') && (i < n)))
-	{
-		if (s1[i] != s2[i])
-		{
-			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
-		}
-		i++;
-	}
-	return (0);
-}
-
-char	*send_char(char c, char *str)
+char	*send_char(int r, char *str)
 {	
 	char	*tmp;
 
-	if (!c)
+	if (r == 0)
 		return (str);
 	tmp = malloc(sizeof(char) * 2);
 	if (!tmp)
 		exit (0);
-	tmp[0] = c;
+	tmp[0] = r;
 	tmp[1] = '\0';
 	if (!str)
 	{
 		str = malloc(sizeof(char) * 2);
 		if (!str)
 			exit (0);
-		str[0] = c;
+		str[0] = r;
 		str[1] = '\0';
 	}
 	else
 	{
-		str = ft_strjoint(str, tmp);
+		str = ft_strjoin(str, tmp);
 		if (str == NULL)
 			exit (0);
 	}
@@ -83,14 +41,31 @@ char	*send_char(char c, char *str)
 	return (str);
 }
 
-static void	handle_signal(int signal, siginfo_t *client, void *unused)
+char	*display_message(int r, char *str, siginfo_t *client)
+{
+	if (r == 0)
+	{	
+		ft_printf("%s\n", str);
+		if (ft_strncmp(str, "end", 3) == 0 && ft_strlen(str) == 3)
+		{	
+			kill(client->si_pid, SIGUSR1);
+			free(str);
+			str = NULL;
+			exit(0);
+		}
+		free(str);
+		str = NULL;
+	}
+	return (str);
+}
+
+void	handle_client_signal(int signal, siginfo_t *client, void *unused)
 {
 	static int		m = 1;
 	static int		r = 0;
 	static int		i = 0;
-	char			c = 0; 
 	static char		*str = NULL;
-	
+
 	(void)unused;
 	if (signal == SIGUSR1)
 	{
@@ -104,21 +79,8 @@ static void	handle_signal(int signal, siginfo_t *client, void *unused)
 	i++;
 	if (i == 8)
 	{
-		c = r;
-		str = send_char(c, str);
-		if (c == 0)
-		{	
-			ft_printf("str : %s\n", str);
-			if (ft_strncmpt(str, "end", 3) == 0 && ft_strlen(str) == 3)
-			{	
-				kill(client->si_pid, SIGUSR1);
-				free(str);
-				str = NULL;
-				exit(0);
-			}
-			free(str);	
-			str = NULL;
-		}
+		str = send_char(r, str);
+		str = display_message(r, str, client);
 		i = 0;
 		m = 1;
 		r = 0;
@@ -130,19 +92,18 @@ int	main(int argc, char **argv)
 {
 	struct sigaction	sact;
 	sigset_t			sigset;
-	
-	if (argc != 1 && argv[0])
-		return(ft_printf("Don't put arg\n"), 0);
-	ft_printf("PID : %d\n", getpid());
 
+	if (argc != 1 && argv[0])
+		return (ft_printf("Don't put arg\n"), 0);
+	ft_printf("PID : %d\n", getpid());
 	sigemptyset(&sact.sa_mask);
 	sigaddset(&sigset, SIGUSR1);
 	sigaddset(&sigset, SIGUSR2);
-	sact.sa_sigaction = handle_signal;
+	sact.sa_sigaction = handle_client_signal;
 	sact.sa_flags = SA_SIGINFO;
 	sigaddset(&sigset, SIGUSR1);
-  	sigaddset(&sigset, SIGUSR2);
-	while(1)
+	sigaddset(&sigset, SIGUSR2);
+	while (1)
 	{
 		sigaction(SIGUSR1, &sact, NULL);
 		sigaction(SIGUSR2, &sact, NULL);

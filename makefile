@@ -24,7 +24,7 @@ $(NAME_CLIENT):	$(OBJ_CLIENT)
 				$(CC) $(FLAGS) $(OBJ_CLIENT) libft/libft.a -o $(NAME_CLIENT)
 
 clean:
-				rm -rf $(OBJ_SERVER) $(OBJ_CLIENT)
+				rm -rf $(OBJ_SERVER) $(OBJ_CLIENT) $(NAME_SERVER) $(NAME_CLIENT)
 				$(MAKE) fclean -C libft
 
 fclean:			clean
