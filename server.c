@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/30 23:29:34 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/31 10:51:54 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ int	ft_strncmpt(char *s1, char *s2, size_t n)
 
 char	*send_char(char c, char *str)
 {	
+	
 	if (!c)
 		return (str);
 	if (!str)
@@ -120,18 +121,24 @@ static void	handle_signal(int signal, siginfo_t *client, void *unused)
 
 int	main(int argc, char **argv)
 {
-	struct sigaction	sig;
+	struct sigaction	sact;
+	sigset_t			sigset;
 	
 	if (argc != 1 && argv[0])
 		return(ft_printf("Don't put arg\n"), 0);
 	ft_printf("PID : %d\n", getpid());
 
-	sig.sa_sigaction = handle_signal;
-	sig.sa_flags = SA_SIGINFO;
+	sigemptyset(&sact.sa_mask);
+	sigaddset(&sigset, SIGUSR1);
+	sigaddset(&sigset, SIGUSR2);
+	sact.sa_sigaction = handle_signal;
+	sact.sa_flags = SA_SIGINFO;
+	sigaddset(&sigset, SIGUSR1);
+  	sigaddset(&sigset, SIGUSR2);
 	while(1)
 	{
-		sigaction(SIGUSR1, &sig, NULL);
-		sigaction(SIGUSR2, &sig, NULL);
+		sigaction(SIGUSR1, &sact, NULL);
+		sigaction(SIGUSR2, &sact, NULL);
 		pause();
 	}
 	return (0);
