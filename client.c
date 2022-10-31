@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:34:13 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/31 12:03:09 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/31 12:18:32 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ int	main(int argc, char **argv)
 	int	strlen;
 
 	if (argc != 3)
-		return (0);
+		return (ft_printf("Wrong args\n"), 0);
 	pid = ft_atoi(argv[1]);
 	if (pid < 1 || pid > 4194304)
-		write(2, "Invalid arguments\n", 18);
+		ft_printf("Invalid pid\n");
 	i = 0;
 	strlen = ft_strlen(argv[2]);
 	signal(SIGUSR1, handle_server_signal);

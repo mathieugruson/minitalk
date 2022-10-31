@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/31 12:02:57 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/31 12:34:31 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,14 @@ char	*send_char(int r, char *str)
 		return (str);
 	tmp = malloc(sizeof(char) * 2);
 	if (!tmp)
-		exit (0);
+		return (NULL);
 	tmp[0] = r;
 	tmp[1] = '\0';
 	if (!str)
 	{
 		str = malloc(sizeof(char) * 2);
 		if (!str)
-			exit (0);
+			return (free(str), NULL);
 		str[0] = r;
 		str[1] = '\0';
 	}
@@ -35,14 +35,18 @@ char	*send_char(int r, char *str)
 	{
 		str = ft_strjoin(str, tmp);
 		if (str == NULL)
-			exit (0);
+			return (NULL);
 	}
-	free(tmp);
-	return (str);
+	return (free(tmp), str);
 }
 
 char	*display_message(int r, char *str, siginfo_t *client)
 {
+	if (str == 0)
+	{
+		ft_printf("Malloc error\n");
+		exit (0);
+	}
 	if (r == 0)
 	{	
 		ft_printf("%s\n", str);
