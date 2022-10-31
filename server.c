@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 16:57:32 by mgruson           #+#    #+#             */
-/*   Updated: 2022/10/31 10:51:54 by mgruson          ###   ########.fr       */
+/*   Updated: 2022/10/31 11:13:08 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,15 @@ int	ft_strncmpt(char *s1, char *s2, size_t n)
 
 char	*send_char(char c, char *str)
 {	
-	
+	char	*tmp;
+
 	if (!c)
 		return (str);
+	tmp = malloc(sizeof(char) * 2);
+	if (!tmp)
+		exit (0);
+	tmp[0] = c;
+	tmp[1] = '\0';
 	if (!str)
 	{
 		str = malloc(sizeof(char) * 2);
@@ -69,10 +75,11 @@ char	*send_char(char c, char *str)
 	}
 	else
 	{
-		str = ft_strjoint(str, &c);
+		str = ft_strjoint(str, tmp);
 		if (str == NULL)
 			exit (0);
 	}
+	free(tmp);
 	return (str);
 }
 
